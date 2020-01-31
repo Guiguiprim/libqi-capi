@@ -235,13 +235,15 @@ TEST(TestValues, testMap)
 
   qi_value_set_int64(key, 0);
   qi_value_set_string(value, "first_value");
-  qi_value_map_set(map, key, value);
+  EXPECT_EQ(1, qi_value_map_set(map, key, value));
 
   qi_value_t *returned_value;
   returned_value = qi_value_map_get(map, key);
 
   msg = qi_value_get_string(returned_value);
-  ASSERT_TRUE(strcmp(msg, "first_value") == 0);
+  ASSERT_TRUE(msg != nullptr);
+  ASSERT_TRUE(strcmp(msg, "first_value") == 0)
+      << msg;
   ASSERT_TRUE(qi_value_map_size(map) == 1);
 
   qi_value_destroy(map);
@@ -261,22 +263,24 @@ TEST(TestValues, testtuple)
   qi_value_t *myint = qi_value_create("i");
   qi_value_set_int64(myint, 42);
 
-  qi_value_tuple_set(mytuple, 0, mystring);
-  qi_value_tuple_set(mytuple, 1, myint);
+  EXPECT_EQ(1, qi_value_tuple_set(mytuple, 0, mystring));
+  EXPECT_EQ(1, qi_value_tuple_set(mytuple, 1, myint));
 
   ASSERT_EQ(qi_value_tuple_size(mytuple), 2);
 
-  qi_value_t *tuple_element = qi_value_tuple_get(mytuple, 0);
-  ASSERT_TRUE(strcmp(qi_value_get_string(tuple_element), "test_string") == 0);
+  qi_value_t *first_element = qi_value_tuple_get(mytuple, 0);
+  EXPECT_TRUE(first_element != nullptr);
+  EXPECT_TRUE(strcmp(qi_value_get_string(first_element), "test_string") == 0);
 
   qi_value_t *second_element = qi_value_tuple_get(mytuple, 1);
+  EXPECT_TRUE(second_element != nullptr);
   qi_value_get_int64(second_element, &result);
-  ASSERT_TRUE(result == 42);
+  EXPECT_TRUE(result == 42) << result << " instead of " << 42;
 
   qi_value_destroy(mytuple);
   qi_value_destroy(mystring);
   qi_value_destroy(myint);
-  qi_value_destroy(tuple_element);
+  qi_value_destroy(first_element);
   qi_value_destroy(second_element);
 }
 

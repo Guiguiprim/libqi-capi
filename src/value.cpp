@@ -184,7 +184,7 @@ int        qi_value_tuple_set(qi_value_t *msg, unsigned int idx, qi_value_t *val
     if (container.kind() != qi::TypeKind_Tuple || idx >= container.size()) {
       return 0;
     }
-    container[idx].set(val);
+    container[idx].update(val);
     return 1;
   } catch (std::runtime_error &) {}
   return 0;
@@ -327,7 +327,7 @@ int         qi_value_map_set(qi_value_t *msg, qi_value_t *key, qi_value_t *value
     return 0;
   }
   try {
-    container[k].set(val);
+    container[k].update(val);
     return 1;
   } catch (std::runtime_error &) {}
   return 0;
