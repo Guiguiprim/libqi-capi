@@ -32,7 +32,10 @@ qi_create_lib("qic" SHARED qic/api.h
                      src/value.cpp
                      src/type.cpp)
 
-qi_use_lib(qic qi)
+#qi_use_lib(qic qi)
+find_package(QI REQUIRED)
+target_link_libraries(qic -Wl,--whole-archive ${QI_LIBRARIES} -Wl,--no-whole-archive)
+include_directories(${QI_INCLUDE_DIRS})
 qi_stage_lib(qic)
 
 add_subdirectory("test")
