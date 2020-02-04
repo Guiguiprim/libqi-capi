@@ -23,6 +23,8 @@ extern "C"
   QIC_API void          qi_session_destroy(qi_session_t *session);
 
   QIC_API qi_future_t*  qi_session_connect(qi_session_t *session, const char   *address);
+  QIC_API qi_future_t*  qi_session_connect_with_authentication(qi_session_t *session,
+                              const char *address, const char* user, const char *token);
 
   QIC_API char*         qi_session_url(qi_session_t *session);
   QIC_API int           qi_session_set_identity(qi_session_t *session, char *key, char* crt);

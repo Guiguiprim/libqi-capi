@@ -14,6 +14,82 @@
 #include <string.h>
 #include <qi/session.hpp>
 #include <qi/messaging/serviceinfo.hpp>
+#include <qi/messaging/authprovider.hpp>
+#include <qi/messaging/clientauthenticator.hpp>
+#include <qi/messaging/clientauthenticatorfactory.hpp>
+
+namespace {
+class PassAuthenticator : public qi::ClientAuthenticator
+{
+public:
+  PassAuthenticator(std::string const &user, std::string const &pwd)
+    : _user(user)
+    , _pwd(pwd)
+  {
+  }
+
+  qi::CapabilityMap initialAuthData() override
+  {
+    qi::CapabilityMap map;
+    map["user"] = qi::AnyValue::from(_user);
+    map["token"] = qi::AnyValue::from(_pwd);
+    return map;
+  }
+
+protected:
+  qi::CapabilityMap _processAuth(const qi::CapabilityMap &authData) override
+  {
+    qi::CapabilityMap result;
+    auto const found = authData.find(qi::AuthProvider::State_Key);
+    if(found == authData.end())
+      return result;
+
+    auto const state = found->second.to<qi::AuthProvider::State>();
+    switch(state)
+    {
+    case qi::AuthProvider::State_Cont:
+      result["token"] = qi::AnyValue::from(_pwd);
+      break;
+    case qi::AuthProvider::State_Done:
+      break;
+    case qi::AuthProvider::State_Error:
+      break;
+    }
+
+    return result;
+  }
+
+private:
+  const std::string _user;
+  const std::string _pwd;
+};
+
+class PassAuthenticatorFactory : public qi::ClientAuthenticatorFactory
+{
+public:
+  PassAuthenticatorFactory(std::string const &user, std::string const &pwd)
+    : _user(user)
+    , _pwd(pwd)
+  {
+  }
+
+  qi::ClientAuthenticatorPtr newAuthenticator() override
+  {
+    return boost::make_shared<PassAuthenticator>(_user, _pwd);
+  }
+
+  static qi::ClientAuthenticatorFactoryPtr make(
+      std::string const &user, std::string const &pwd)
+  {
+    return qi::ClientAuthenticatorFactoryPtr(
+        new PassAuthenticatorFactory(user, pwd));
+  }
+
+private:
+  const std::string _user;
+  const std::string _pwd;
+};
+} // namespace
 
 #ifdef __cplusplus
 extern "C"
@@ -43,6 +119,14 @@ int qi_session_is_connected(qi_session_t *session)
 qi_future_t* qi_session_connect(qi_session_t *session, const char *address)
 {
   qi::Session *s = reinterpret_cast<qi::Session*>(session);
+  return qi_future_wrap(s->connect(address));
+}
+
+qi_future_t *qi_session_connect_with_authentication(qi_session_t *session,
+    const char *address, const char *user, const char *token)
+{
+  qi::Session *s = reinterpret_cast<qi::Session *>(session);
+  s->setClientAuthenticatorFactory(PassAuthenticatorFactory::make(user, token));
   return qi_future_wrap(s->connect(address));
 }
 
