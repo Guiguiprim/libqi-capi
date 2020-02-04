@@ -110,45 +110,39 @@ const char*     qi_value_get_signature(qi_value_t* value, int resolveDynamics)
   return qi::os::strdup(val.signature(!!resolveDynamics).toString().c_str());
 }
 
-//# UINT64
-int qi_value_set_uint64(qi_value_t* container, unsigned long long value)
-{ return qi_value_set_pod<unsigned long long>(container, value); }
+#define QI_CONCAT(a, b) a##b
+#define QI_CONCAT3(a, b, c) a##b##c
+#define IMPL_POD_SET_GET(name, type)                                           \
+  QIC_API int QI_CONCAT(qi_value_set_, name)(qi_value_t * value, type val)     \
+  {                                                                            \
+    return qi_value_set_pod<type>(value, val);                                 \
+  }                                                                            \
+  QIC_API int QI_CONCAT(qi_value_get_, name)(qi_value_t * value, type * val)   \
+  {                                                                            \
+    return qi_value_get_pod<type>(value, val);                                 \
+  }                                                                            \
+  QIC_API type QI_CONCAT3(qi_value_get_, name, _default)(                      \
+      qi_value_t * value, type defVal)                                         \
+  {                                                                            \
+    return qi_value_get_pod_default<type>(value, defVal);                      \
+  }
 
-int qi_value_get_uint64(qi_value_t* container, unsigned long long *result)
-{ return qi_value_get_pod<unsigned long long>(container, result); }
+IMPL_POD_SET_GET(int8, signed char)
+IMPL_POD_SET_GET(int16, short)
+IMPL_POD_SET_GET(int32, int)
+IMPL_POD_SET_GET(int64, long long)
 
-unsigned long long qi_value_get_uint64_default(qi_value_t *container, unsigned long long defvalue)
-{ return qi_value_get_pod_default<unsigned long long>(container, defvalue); }
+IMPL_POD_SET_GET(uint8, unsigned char)
+IMPL_POD_SET_GET(uint16, unsigned short)
+IMPL_POD_SET_GET(uint32, unsigned int)
+IMPL_POD_SET_GET(uint64, unsigned long long)
 
-//# INT64
-int qi_value_set_int64(qi_value_t* container, long long value)
-{ return qi_value_set_pod<long long>(container, value); }
+IMPL_POD_SET_GET(float, float)
+IMPL_POD_SET_GET(double, double)
 
-int qi_value_get_int64(qi_value_t* container, long long *result)
-{ return qi_value_get_pod<long long>(container, result); }
-
-long long qi_value_get_int64_default(qi_value_t *container, long long defvalue)
-{ return qi_value_get_pod_default<long long>(container, defvalue); }
-
-//# FLOAT
-int qi_value_set_float(qi_value_t* container, float value)
-{ return qi_value_set_pod<float>(container, value); }
-
-int qi_value_get_float(qi_value_t* container, float *result)
-{ return qi_value_get_pod<float>(container, result); }
-
-float qi_value_get_float_default(qi_value_t *container, float defvalue)
-{ return qi_value_get_pod_default<float>(container, defvalue); }
-
-//# DOUBLE
-int qi_value_set_double(qi_value_t* container, double value)
-{ return qi_value_set_pod<double>(container, value); }
-
-int qi_value_get_double(qi_value_t* container, double *result)
-{ return qi_value_get_pod<double>(container, result); }
-
-double qi_value_get_double_default(qi_value_t *container, double defvalue)
-{ return qi_value_get_pod_default<double>(container, defvalue); }
+#undef IMPL_POD_SET_GET
+#undef QI_CONCAT
+#undef QI_CONCAT3
 
 //# STRING
 int        qi_value_set_string(qi_value_t *container, const char *s)

@@ -57,22 +57,30 @@ extern "C"
   QIC_API const char*     qi_value_get_signature(qi_value_t* value, int resolveDynamics);
   QIC_API qi_type_t*      qi_value_get_type(qi_value_t* value);
 
-  //# INT/UINT
-  QIC_API int                qi_value_set_uint64(qi_value_t *value, unsigned long long ul);
-  QIC_API int                qi_value_get_uint64(qi_value_t *value, unsigned long long *defvalue);
-  QIC_API unsigned long long qi_value_get_uint64_default(qi_value_t *value, unsigned long long defvalue);
-  QIC_API int                qi_value_set_int64(qi_value_t  *value, long long l);
-  QIC_API int                qi_value_get_int64(qi_value_t  *value, long long *l);
-  QIC_API long long          qi_value_get_int64_default(qi_value_t  *value, long long defvalue);
+#define QI_CONCAT(a, b) a##b
+#define QI_CONCAT3(a, b, c) a##b##c
+#define DEF_POD_SET_GET(name, type)                                            \
+  QIC_API int QI_CONCAT(qi_value_set_, name)(qi_value_t * value, type val);    \
+  QIC_API int QI_CONCAT(qi_value_get_, name)(qi_value_t * value, type * val);  \
+  QIC_API type QI_CONCAT3(qi_value_get_, name, _default)(                      \
+      qi_value_t * value, type defVal);
 
-  //# FLOAT/DOUBLE
-  QIC_API int qi_value_set_float(qi_value_t  *msg, float f);
-  QIC_API int qi_value_get_float(qi_value_t  *msg, float *f);
-  QIC_API float qi_value_get_float_default(qi_value_t  *msg, float defvalue);
+  DEF_POD_SET_GET(int8, signed char)
+  DEF_POD_SET_GET(int16, short)
+  DEF_POD_SET_GET(int32, int)
+  DEF_POD_SET_GET(int64, long long)
 
-  QIC_API int qi_value_set_double(qi_value_t *msg, double d);
-  QIC_API int qi_value_get_double(qi_value_t *msg, double *d);
-  QIC_API double qi_value_get_double_default(qi_value_t *msg, double defvalue);
+  DEF_POD_SET_GET(uint8, unsigned char)
+  DEF_POD_SET_GET(uint16, unsigned short)
+  DEF_POD_SET_GET(uint32, unsigned int)
+  DEF_POD_SET_GET(uint64, unsigned long long)
+
+  DEF_POD_SET_GET(float, float)
+  DEF_POD_SET_GET(double, double)
+
+#undef DEF_POD_SET_GET
+#undef QI_CONCAT
+#undef QI_CONCAT3
 
   //# STRING
   QIC_API int         qi_value_set_string(qi_value_t *value, const char *s);
