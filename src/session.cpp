@@ -89,6 +89,12 @@ private:
   const std::string _user;
   const std::string _pwd;
 };
+
+qi::Session *get_session_cpp(qi_session_t* s) {
+  qi::SessionPtr &session = (*reinterpret_cast<qi::SessionPtr*>(s));
+  return session.get();
+}
+
 } // namespace
 
 #ifdef __cplusplus
@@ -98,88 +104,83 @@ extern "C"
 
 qi_session_t *qi_session_create()
 {
-  qi::Session *session = new qi::Session();
-
+  qi::SessionPtr *session = new qi::SessionPtr(qi::makeSession());
   return reinterpret_cast<qi_session_t*>(session);
 }
 
 void qi_session_destroy(qi_session_t *session)
 {
-  qi::Session *s = reinterpret_cast<qi::Session*>(session);
-
+  qi::SessionPtr *s  = reinterpret_cast<qi::SessionPtr*>(session);
   delete s;
 }
 
 int qi_session_is_connected(qi_session_t *session)
 {
-  qi::Session *s = reinterpret_cast<qi::Session*>(session);
+  qi::Session *s = get_session_cpp(session);
   return s->isConnected();
 }
 
 qi_future_t* qi_session_connect(qi_session_t *session, const char *address)
 {
-  qi::Session *s = reinterpret_cast<qi::Session*>(session);
+  qi::Session *s = get_session_cpp(session);
   return qi_future_wrap(s->connect(address));
 }
 
 qi_future_t *qi_session_connect_with_authentication(qi_session_t *session,
     const char *address, const char *user, const char *token)
 {
-  qi::Session *s = reinterpret_cast<qi::Session *>(session);
+  qi::Session *s = get_session_cpp(session);
   s->setClientAuthenticatorFactory(PassAuthenticatorFactory::make(user, token));
   return qi_future_wrap(s->connect(address));
 }
 
 char * qi_session_url(qi_session_t* session)
 {
-  qi::Session *s = reinterpret_cast<qi::Session*>(session);
+  qi::Session *s = get_session_cpp(session);
   return qi::os::strdup(s->url().str().c_str());
 
 }
 
 int qi_session_set_identity(qi_session_t *session, char *key, char *crt)
 {
-  qi::Session *s = reinterpret_cast<qi::Session*>(session);
+  qi::Session *s = get_session_cpp(session);
   return (int)s->setIdentity(key, crt);
 }
 
 
 qi_future_t* qi_session_close(qi_session_t *session)
 {
-  qi::Session *s = reinterpret_cast<qi::Session*>(session);
+  qi::Session *s = get_session_cpp(session);
   return qi_future_wrap(s->close());
 }
 
 qi_future_t* qi_session_get_service(qi_session_t *session, const char *name)
 {
-  qi::Session *s = reinterpret_cast<qi::Session*>(session);
-
-  if (!s)
-    return 0;
+  qi::Session *s = get_session_cpp(session);
   return qi_future_wrap(s->service(name));
 }
 
 qi_future_t* qi_session_get_services(qi_session_t *session)
 {
-  qi::Session *s = reinterpret_cast<qi::Session*>(session);
+  qi::Session *s = get_session_cpp(session);
   return qi_future_wrap(s->services());
 }
 
 qi_future_t* qi_session_listen(qi_session_t *session, const char *address)
 {
-  qi::Session *s = reinterpret_cast<qi::Session*>(session);
+  qi::Session *s = get_session_cpp(session);
   return qi_future_wrap(s->listen(address));
 }
 
 qi_future_t* qi_session_listen_standalone(qi_session_t *session, const char *address)
 {
-  qi::Session *s = reinterpret_cast<qi::Session*>(session);
+  qi::Session *s = get_session_cpp(session);
   return qi_future_wrap(s->listenStandalone(address));
 }
 
 qi_value_t*  qi_session_endpoints(qi_session_t *session)
 {
-  qi::Session *s = reinterpret_cast<qi::Session*>(session);
+  qi::Session *s = get_session_cpp(session);
 
   std::vector<qi::Url> eps = s->endpoints();
   std::vector<std::string> epss;
@@ -196,14 +197,14 @@ qi_value_t*  qi_session_endpoints(qi_session_t *session)
 
 qi_future_t* qi_session_register_service(qi_session_t *session, const char *name, qi_object_t *object)
 {
-  qi::Session *s = reinterpret_cast<qi::Session*>(session);
+  qi::Session *s = get_session_cpp(session);
   qi::AnyObject  *obj = reinterpret_cast<qi::AnyObject *>(object);
   return qi_future_wrap(s->registerService(name, *obj));
 }
 
 qi_future_t* qi_session_unregister_service(qi_session_t *session, unsigned int idx)
 {
-  qi::Session *s = reinterpret_cast<qi::Session*>(session);
+  qi::Session *s = get_session_cpp(session);
   return qi_future_wrap(s->unregisterService(idx));
 }
 
