@@ -62,6 +62,12 @@ qi_value_t* qi_value_create(const char *signature)
   return (qi_value_t*)v;
 }
 
+qi_value_t *qi_value_create_from_type(qi_type_t *type)
+{
+  auto t = reinterpret_cast<qi::TypeInterface*>(type);
+  return reinterpret_cast<qi_value_t*>(new qi::AnyValue(t));
+}
+
 void qi_value_destroy(qi_value_t* val)
 {
   qi::AnyValue *v = &qi_value_cpp(val);

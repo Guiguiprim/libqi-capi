@@ -45,6 +45,7 @@ extern "C"
 
   //# CTOR/DTOR/COPY
   QIC_API qi_value_t* qi_value_create(const char *sig);
+  QIC_API qi_value_t* qi_value_create_from_type(qi_type_t *type);
   QIC_API void        qi_value_destroy(qi_value_t *v);
 
 
