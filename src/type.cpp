@@ -73,7 +73,11 @@ qi_type_t*   qi_type_get_element(qi_type_t* type, int index) {
   return 0;
 }
 
-
+qi_signature_t *qi_type_get_signature(qi_type_t *type)
+{
+  auto t = reinterpret_cast<qi::TypeInterface*>(type);
+  return reinterpret_cast<qi_signature_t*>(new qi::Signature(t->signature()));
+}
 
 #ifdef __cplusplus
 }

@@ -20,6 +20,7 @@ qi_create_lib("qic" SHARED qic/api.h
                      qic/object.h
                      qic/future.h
                      qic/value.h
+                     qic/signature.h
                      qic/type.h
 
                      src/object_p.h
@@ -27,6 +28,7 @@ qi_create_lib("qic" SHARED qic/api.h
                      src/future_p.h
                      src/future.cpp
                      src/session.cpp
+                     src/signature.cpp
                      src/application.cpp
                      src/value_p.h
                      src/value.cpp

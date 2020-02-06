@@ -24,6 +24,7 @@ typedef struct qi_servicedirectory_t_s qi_servicedirectory_t;
 typedef struct qi_session_t_s          qi_session_t;
 typedef struct qi_value_t_s            qi_value_t;
 typedef struct qi_type_t_s             qi_type_t;
+typedef struct qi_signature_t_s        qi_signature_t;
 
 #ifdef __cplusplus
 }

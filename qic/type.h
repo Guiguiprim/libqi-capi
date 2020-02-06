@@ -64,6 +64,8 @@ QIC_API qi_type_t*   qi_type_get_value(qi_type_t* type);
 QIC_API int          qi_type_get_element_count(qi_type_t* type);
 QIC_API qi_type_t*   qi_type_get_element(qi_type_t* type, int index);
 
+QIC_API qi_signature_t*   qi_type_get_signature(qi_type_t* type);
+
 #ifdef __cplusplus
 }
 #endif
