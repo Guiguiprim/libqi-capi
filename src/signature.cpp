@@ -17,6 +17,12 @@ void qi_signature_destroy(qi_signature_t *signature)
   delete s;
 }
 
+qi_signature_t *qi_signature_clone(qi_signature_t *signature)
+{
+  auto s = reinterpret_cast<qi::Signature*>(signature);
+  return reinterpret_cast<qi_signature_t*>(new qi::Signature(*s));
+}
+
 const char *qi_signature_to_string(qi_signature_t *signature)
 {
   auto s = reinterpret_cast<qi::Signature*>(signature);
